@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-client-provisioner
+  labels:
+    app: nfs-client-provisioner
+  # replace with namespace where provisioner is deployed
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nfs-client-provisioner
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-client-provisioner
+      containers:
+        - name: nfs-client-provisioner
+          image: quay.io/external_storage/nfs-client-provisioner:latest
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: fuseim.pri/ifs  #这个是PROVISIONER的名字，名字后面会用到
+            - name: NFS_SERVER
+              value: 10.10.10.60 #NFS地址
+            - name: NFS_PATH
+              value: /ifs/kubernetes #NFS服务器共享路径
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: 10.10.10.60 #修改成实际NFS地址
+            path: /ifs/kubernetes #修改成NFS服务器共享路径
