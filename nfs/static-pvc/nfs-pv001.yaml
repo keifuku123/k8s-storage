@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+name: nfs-pv001
+labels:
+  pv: nfs-pv001
+spec:
+capacity:
+  storage: 1Gi
+accessModes:
+  - ReadWriteMany
+persistentVolumeReclaimPolicy: Recycle
+storageClassName: nfs
+nfs:
+  path: /nfs/data/pv001 #修改自己nfs的共享目录
+  server: 192.168.88.111 #修改成自己的NFS服务器地址
